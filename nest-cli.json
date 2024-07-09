@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/stalk-marks-app/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/stalk-marks-app/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/stalk-marks-app",
+  "projects": {
+    "stalk-marks-app": {
+      "type": "application",
+      "root": "apps/stalk-marks-app",
+      "entryFile": "main",
+      "sourceRoot": "apps/stalk-marks-app/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/stalk-marks-app/tsconfig.app.json"
+      }
+    },
+    "storage": {
+      "type": "application",
+      "root": "apps/storage",
+      "entryFile": "main",
+      "sourceRoot": "apps/storage/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/storage/tsconfig.app.json"
+      }
+    }
+  }
+}
