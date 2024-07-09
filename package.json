@@ -18,6 +18,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/stalk-marks-app/test/jest-e2e.json",
+    "prisma:studio": "npx prisma studio",
+    "prisma:gen": "prisma generate --watch",
     "dev": "concurrently \"yarn:start:dev\" \"nest start --watch storage\" \"yarn:prisma:gen\""
   },
   "dependencies": {
@@ -27,8 +29,10 @@
     "@nestjs/config": "^3.2.3",
     "@nestjs/core": "^9.0.0",
     "@nestjs/graphql": "^12.2.0",
+    "@nestjs/jwt": "^10.2.0",
     "@nestjs/platform-express": "^10.3.10",
     "@prisma/client": "^5.16.1",
+    "argon2": "^0.40.3",
     "concurrently": "^8.2.2",
     "cypher-query-builder": "^6.0.4",
     "graphql": "^16.9.0",

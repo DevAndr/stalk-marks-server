@@ -14,11 +14,14 @@ datasource db {
 }
 
 model User {
-  id       String   @unique @default(uuid())
-  createAt DateTime @default(now())
-  name     String
-  Object   Object[]
-  Post     Post[]
+  id               String   @unique @default(uuid())
+  createAt         DateTime @default(now())
+  userName         String   @unique
+  email            String   @unique
+  Object           Object[]
+  Post             Post[]
+  hashPassword     String
+  hashRefreshToken String?
 }
 
 model Object {
