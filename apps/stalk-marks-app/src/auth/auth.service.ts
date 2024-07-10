@@ -86,7 +86,9 @@ export class AuthService {
     return tokens;
   }
 
-  async signOut() {}
+  async logOut(id: string) {
+    return true;
+  }
 
   async refresh() {}
 
