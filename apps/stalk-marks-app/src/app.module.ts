@@ -7,6 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { AtGuard } from './common/guards/at.guard';
 import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
+import { ObjectModule } from './object/object.module';
+import { Neo4jModule } from './neo4j/neo4j.module';
 
 @Module({
   imports: [
@@ -14,6 +16,7 @@ import { UserModule } from './user/user.module';
     PrismaModule,
     AuthModule,
     UserModule,
+    ObjectModule,
   ],
   controllers: [AppController],
   providers: [

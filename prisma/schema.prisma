@@ -25,12 +25,21 @@ model User {
 }
 
 model Object {
-  id          String   @unique @default(uuid())
+  id          String     @unique @default(uuid())
   userId      String
-  createAt    DateTime @default(now())
-  owner       User     @relation(fields: [userId], references: [id])
+  createAt    DateTime   @default(now())
+  owner       User       @relation(fields: [userId], references: [id])
   name        String
   description String
+  categories  Category[]
+}
+
+model Category {
+  id       String   @unique @default(uuid())
+  createAt DateTime @default(now())
+  name     String
+  Object   Object?  @relation(fields: [objectId], references: [id])
+  objectId String?
 }
 
 model Post {
