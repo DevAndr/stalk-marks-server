@@ -11,7 +11,7 @@ import * as argon from 'argon2';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from '../user/user.service';
 import { SignInData, SignUpData } from './dto';
-import { JwtPayload, Tokens } from './types';
+import { JwtPayload, SignInResponse, SignUpResponse, Tokens } from './types';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +22,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signUp(data: SignUpData) {
+  async signUp(data: SignUpData): Promise<SignUpResponse> {
     const { userName, email, password, ...payload } = data;
 
     const checkUser = this.userService.isUniqueUsername(userName);
@@ -50,7 +50,7 @@ export class AuthService {
       const tokens = await this.createTokens(newUser.id, userName);
       await this.updateRefreshToken(newUser.id, tokens.refreshToken);
 
-      return tokens;
+      return {user: {userName: newUser.userName, email: newUser.email}, tokens};
     } else {
       throw new HttpException(
         `Пользователь уже существует с такими данными: ${userName}`,
@@ -59,7 +59,7 @@ export class AuthService {
     }
   }
 
-  async signIn(data: SignInData) {
+  async signIn(data: SignInData): Promise<SignInResponse> {
     const user = await this.prisma.user.findFirst({
       where: {
         userName: data.userName,
@@ -83,14 +83,30 @@ export class AuthService {
     const tokens = await this.createTokens(user.id, user.userName);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
-    return tokens;
+    return {user: {userName: user.userName, email: user.email}, tokens};
   }
 
   async logOut(id: string) {
     return true;
   }
 
-  async refresh() {}
+  async refresh(id: string, rt: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!user || !user.hashRefreshToken) throw new ForbiddenException('Access Denied');
+
+    const rtMatches = await argon.verify(user.hashRefreshToken, rt);
+    if (!rtMatches) throw new ForbiddenException('Access Denied');
+
+    const tokens = await this.createTokens(user.id, user.email);
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
+
+    return tokens;
+  }
 
   async verify() {}
 

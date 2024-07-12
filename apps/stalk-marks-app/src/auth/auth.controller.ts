@@ -6,12 +6,13 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { GetCurrentUserId, Public } from '../common/decorators';
+import { Cookies, GetCurrentUser, GetCurrentUserId, Public } from '../common/decorators';
 import { AuthService } from './auth.service';
 import { SignInData, SignUpData } from './dto';
 import { RtGuard } from '../common/guards';
 import { Tokens } from './types';
 import { Req } from '@nestjs/common';
+import { setTokensCookie } from './utils';
 
 @Controller('auth')
 export class AuthController {
@@ -20,14 +21,18 @@ export class AuthController {
   @Post('signUp')
   @Public()
   @HttpCode(HttpStatus.CREATED)
-  signUp(@Body() data: SignUpData) {
-    return this.authService.signUp(data);
+  async signUp(@Req() req, @Body() data: SignUpData) {
+    const signUpData = await this.authService.signUp(data);
+    setTokensCookie(req, signUpData.tokens);
+    return signUpData
   }
 
   @Post('signIn')
   @Public()
   @HttpCode(HttpStatus.CREATED)
-  signIn(@Body() data: SignInData) {
+  async signIn(@Req() req, @Body() data: SignInData) {
+    const signInData = await this.authService.signIn(data);
+    setTokensCookie(req, signInData.tokens);
     return this.authService.signIn(data);
   }
 
@@ -38,11 +43,11 @@ export class AuthController {
   async refreshToken(
     @Req() req,
     @GetCurrentUserId() id: string,
-    @Cookies('refresh_token') refreshToken: string,
+    @GetCurrentUser('refreshToken') refreshToken: string,
   ) {
-    const tokens = await this.authService.refreshToken(id, refreshToken);
+    const tokens = await this.authService.refresh(id, refreshToken);
     console.log('refreshToken', id, refreshToken, tokens);
-    // this.setTokensCookie(req, tokens);
+    setTokensCookie(req, tokens);
     return tokens;
   }
 
@@ -51,4 +56,6 @@ export class AuthController {
   async logOutLocal(@GetCurrentUserId() id: string): Promise<boolean> {
     return this.authService.logOut(id);
   }
+
+
 }
