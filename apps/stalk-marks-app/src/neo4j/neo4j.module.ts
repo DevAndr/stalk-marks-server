@@ -5,8 +5,11 @@ import neo4j from 'neo4j-driver';
 import { ConnectionWithDriver, Neo4jConfig } from './config/types';
 import { NEO4J_CONFIG, NEO4J_CONNECTION } from './neo4j.constans';
 import { ConnectionError, createDatabaseConfig } from './neo4j.utils';
+import { Neo4jService } from './neo4j.service';
 
-@Module({})
+@Module({
+  providers: [Neo4jService]
+})
 export class Neo4jModule {
   static forRootAsync(neo4jConfig?: Neo4jConfig): DynamicModule {
     return {
@@ -27,6 +30,9 @@ export class Neo4jModule {
           useFactory: async (config: Neo4jConfig) => {
             const { host, scheme, port, username, password } = config;
 
+            console.log('Neo4jModule', { host, scheme, port, username, password });
+            
+
             try {
               const connection = new Connection(`${scheme}://${host}:${port}`, {
                 username,
@@ -38,7 +44,7 @@ export class Neo4jModule {
                 neo4j.auth.basic(username, password),
               );
 
-              await driver.verifyAuthentication();
+              await driver.verifyAuthentication(); 
 
               return connection;
             } catch (error) {
@@ -47,6 +53,7 @@ export class Neo4jModule {
           },
         },
       ],
+      exports: [Neo4jService],
     };
   }
 }
